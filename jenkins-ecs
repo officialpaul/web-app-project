@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     echo "Pull Source code from Git"
-                    git branch: 'docker', url: 'https://github.com/seunayolu/maven-jenkins-project.git'
+                    git branch: 'docker', url: 'https://github.com/paul0581/web-app-project.git'
                 }
             }
         }
