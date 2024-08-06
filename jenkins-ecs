@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     echo "Pull Source code from Git"
-                    git branch: 'docker', url: 'https://github.com/paul0581/web-app-project.git'
+                    git branch: 'master', url: 'https://github.com/paul0581/web-app-project.git'
                 }
             }
         }
