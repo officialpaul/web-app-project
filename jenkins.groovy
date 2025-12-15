@@ -59,10 +59,9 @@ pipeline {
 
     post {
         always {
-            sh 'docker logout'
-        }
-        success {
-            echo '✅ Image pushed to Docker Hub successfully'
+            node {
+                sh 'docker logout'
+            }
         }
         failure {
             echo '❌ Build or push failed'
