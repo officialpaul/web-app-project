@@ -58,10 +58,8 @@ pipeline {
     }
 
     post {
-        always {
-            node {
-                sh 'docker logout'
-            }
+        success {
+            echo '✅ Build and push completed successfully'
         }
         failure {
             echo '❌ Build or push failed'
