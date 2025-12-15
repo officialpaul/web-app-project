@@ -1,29 +1,72 @@
 pipeline {
     agent any
 
+    tools {
+        maven "Maven3"
+        jdk "Openjdk_17"
+    }
+
+   environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+        DOCKER_IMAGE = 'mod-v1'
+        DOCKER_TAG = 'latest build'
+    }
+
     stages {
-        stage('Checkout') {
+        stage ('fetch code') {
             steps {
-                git 'https://github.com/officialpaul/web-app-project.git'
+                script {
+                    echo "Pull Source code from Git"
+                    git branch: 'master', url: 'https://github.com/paul0581/web-app-project.git'
+                }
             }
         }
 
-        stage('Build') {
+        stage ('Build App') {
             steps {
-                echo 'Building...'
+                script {
+                    echo "Building WAR with Maven"
+                    sh 'mvn install -DskipTests'
+                }
             }
         }
 
-        stage('Test') {
-            steps {
-                echo 'Running tests...'
+        stage ('Build Docker Image') {
+            steps{
+                script {
+                    dockerImage = docker.build(awsEcrRegistry + ":$BUILD_NUMBER", "./Docker-files/app/multistage/")
+                }
             }
         }
 
-        stage('Deploy') {
+        stage('Docker Login') {
             steps {
-                echo 'Deploying...'
+                sh """
+                  echo "${DOCKERHUB_CREDENTIALS_PSW}" | \
+                  docker login -u "${DOCKERHUB_CREDENTIALS_USR}" --password-stdin
+                """
+            }
+        }
+
+        stage('Push Image to Docker Hub') {
+            steps {
+                sh """
+                  docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                """
             }
         }
     }
+
+    post {
+        always {
+            sh 'docker logout'
+        }
+        success {
+            echo '✅ Image pushed to Docker Hub successfully'
+        }
+        failure {
+            echo '❌ Build or push failed'
+        }
+    }
 }
+ 
