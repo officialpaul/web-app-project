@@ -8,7 +8,7 @@ pipeline {
 
    environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
-        DOCKER_IMAGE = 'mod-v1'
+        DOCKER_IMAGE = 'officialpaul/web-app'
         DOCKER_TAG = 'latest build'
     }
 
