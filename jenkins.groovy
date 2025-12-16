@@ -9,7 +9,7 @@ pipeline {
    environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
         DOCKER_IMAGE = 'officialpaul/web-app'
-        DOCKER_TAG = 'latest build'
+        DOCKER_TAG = 'latest-build'
     }
 
     stages {
@@ -40,14 +40,15 @@ pipeline {
         }
 
 
-        stage('Docker Login') {
-            steps {
-                sh """
-                  echo "${dockerhub-creds}" | \
-                  docker login -u "${dockerhub-creds}" --password-stdin
-                """
-            }
-        }
+         stages {
+             stage('Docker Login') {
+               steps {
+                 sh '''
+                    echo "$DOCKERHUB_CREDENTIALS_PSW" | \
+                    docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin
+                 '''
+               }
+             }
 
         stage('Push Image to Docker Hub') {
             steps {
