@@ -31,13 +31,14 @@ pipeline {
             }
         }
 
-        stage ('Build Docker Image') {
-            steps{
-                script {
-                    dockerImage = docker.build(awsEcrRegistry + ":$BUILD_NUMBER", "./Docker-files/app/multistage/")
-                }
+        stage('Build') {
+            steps {
+                // Get some code from a GitHub repository 
+                git 'https://github.com/officialpaul/web-app-project.git'
+                sh "mvn -Dmaven.test.failure.ignore=true clean compile"
             }
         }
+
 
         stage('Docker Login') {
             steps {
