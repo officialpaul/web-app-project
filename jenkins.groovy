@@ -67,5 +67,5 @@ pipeline {
             echo '❌ Build or push failed'
         }
     }
+  }
 }
- 
