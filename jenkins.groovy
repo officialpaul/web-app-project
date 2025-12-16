@@ -6,55 +6,48 @@ pipeline {
         jdk "Openjdk_17"
     }
 
-   environment {
+    environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
         DOCKER_IMAGE = 'officialpaul/web-app'
         DOCKER_TAG = 'latest-build'
     }
 
     stages {
-        stage ('fetch code') {
+
+        stage('Fetch Code') {
             steps {
-                script {
-                    echo "Pull Source code from Git"
-                    git branch: 'master', url: 'https://github.com/paul0581/web-app-project.git'
-                }
+                echo "Pull Source code from Git"
+                git branch: 'master', url: 'https://github.com/paul0581/web-app-project.git'
             }
         }
 
-        stage ('Build App') {
+        stage('Build App') {
             steps {
-                script {
-                    echo "Building WAR with Maven"
-                    sh 'mvn install -DskipTests'
-                }
+                echo "Building WAR with Maven"
+                sh 'mvn install -DskipTests'
             }
         }
 
-        stage('Build') {
+        stage('Compile') {
             steps {
-                // Get some code from a GitHub repository 
-                git 'https://github.com/officialpaul/web-app-project.git'
-                sh "mvn -Dmaven.test.failure.ignore=true clean compile"
+                sh 'mvn -Dmaven.test.failure.ignore=true clean compile'
             }
         }
 
-
-         stages {
-             stage('Docker Login') {
-               steps {
-                 sh '''
+        stage('Docker Login') {
+            steps {
+                sh '''
                     echo "$DOCKERHUB_CREDENTIALS_PSW" | \
                     docker login -u "$DOCKERHUB_CREDENTIALS_USR" --password-stdin
-                 '''
-               }
-             }
+                '''
+            }
+        }
 
         stage('Push Image to Docker Hub') {
             steps {
-                sh """
-                  docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
-                """
+                sh '''
+                    docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+                '''
             }
         }
     }
@@ -67,5 +60,4 @@ pipeline {
             echo '❌ Build or push failed'
         }
     }
-  }
 }
